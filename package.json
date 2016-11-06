@@ -22,6 +22,17 @@
   },
   "homepage": "https://github.com/sfpgmr/3d_codes#readme",
   "dependencies": {
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "tween": "^0.9.0"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.17.5",
+    "gulp-logger": "0.0.2",
+    "gulp-plumber": "^1.1.0",
+    "gulp-watch": "^4.3.10",
+    "rollup": "^0.36.3",
+    "rollup-plugin-commonjs": "^5.0.5",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "vinyl-source-stream": "^1.1.0"
   }
 }
