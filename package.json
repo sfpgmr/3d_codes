@@ -1,0 +1,27 @@
+{
+  "name": "3d_codes",
+  "version": "1.0.0",
+  "description": "3D Codes",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sfpgmr/3d_codes.git"
+  },
+  "keywords": [
+    "3D",
+    "three.js",
+    "WebGL"
+  ],
+  "author": "S.F.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sfpgmr/3d_codes/issues"
+  },
+  "homepage": "https://github.com/sfpgmr/3d_codes#readme",
+  "dependencies": {
+    "gulp": "^3.9.1"
+  }
+}
