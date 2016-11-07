@@ -39,59 +39,13 @@ const fragmentShader  = `
 uniform vec2 resolution;
 uniform float time;
 varying vec2 vUv;
-
-
-float HueToRGB(float f1, float f2, float hue) 
-{ 
-    if (hue < 0.0) 
-        hue += 1.0; 
-    else if (hue > 1.0) 
-        hue -= 1.0; 
-    float res; 
-    if ((6.0 * hue) < 1.0) 
-        res = f1 + (f2 - f1) * 6.0 * hue; 
-    else if ((2.0 * hue) < 1.0) 
-        res = f2; 
-    else if ((3.0 * hue) < 2.0) 
-        res = f1 + (f2 - f1) * ((2.0 / 3.0) - hue) * 6.0; 
-    else 
-        res = f1; 
-    return res; 
-}
-
-vec3 HSLToRGB(vec3 hsl) 
-{ 
-    vec3 rgb; 
-    
-    if (hsl.y == 0.0) 
-        rgb = vec3(hsl.z, hsl.z, hsl.z); // Luminance 
-    else 
-    { 
-        float f2; 
-        
-        if (hsl.z < 0.5) 
-            f2 = hsl.z * (1.0 + hsl.y); 
-        else 
-            f2 = (hsl.z + hsl.y) - (hsl.y * hsl.z); 
-            
-        float f1 = 2.0 * hsl.z - f2; 
-        
-        rgb.r = HueToRGB(f1, f2, hsl.x + (1.0/3.0)); 
-        rgb.g = HueToRGB(f1, f2, hsl.x); 
-        rgb.b= HueToRGB(f1, f2, hsl.x - (1.0/3.0)); 
-    } 
-    
-    return rgb; 
-}
-
 void main()	{
   vec2 p;
   p.x = (-1.0 + 2.0 * gl_FragCoord.x / resolution.x) * resolution.x / resolution.y ;
   p.y = -1.0 + 2.0 * gl_FragCoord.y / resolution.y;
 
-  float c = sin(cos(length(p)) * 5. + time / 1000.);
-  gl_FragColor = vec4(HSLToRGB(vec3(c,1.,0.5)),1.0);
-  //gl_FragColor = smoothstep(10./50., 0., abs(c - 0.25) ) * vec4(1.,0.,0.,1.);
+  float c = sin(length(p) * 100. + atan(p.y,p.x) * 40. -  time / 50.);
+  gl_FragColor = smoothstep(2./5., 0., abs(c - 0.5) ) * vec4(1.,0.,0.,1.);
 }`;
 
 // メイン
