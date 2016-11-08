@@ -1,32 +1,7 @@
-"use strict";
-
-//The MIT License (MIT)
-//
-//Copyright (c) 2016 Satoshi Fujiwara
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in
-//all copies or substantial portions of the Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//THE SOFTWARE.
-
-"use strict";
+(function () {
+'use strict';
 
 var time = 0;
-const fps = 60;
-
 const vertexShader = `
 varying vec2 vUv;
 void main()	{
@@ -44,8 +19,8 @@ void main()	{
   p.x = (-1.0 + 2.0 * gl_FragCoord.x / resolution.x) * resolution.x / resolution.y ;
   p.y = -1.0 + 2.0 * gl_FragCoord.y / resolution.y;
 
-  float c = sin(length(p) * 100. *  sin(atan(p.y,p.x)) +  time / 50.);
-  gl_FragColor = smoothstep(2., 0., abs(c - 0.5) ) * vec4(1.,0.,0.,1.);
+  float c = cos(atan(p.y,p.x) * 36.0 ) * sin(length(p) * 36.0 + time / 100.) ;
+  gl_FragColor = smoothstep(0.5, 0., abs(c - 0.5) ) * vec4(1.,0.,1.,1.);
 }`;
 
 // メイン
@@ -100,4 +75,4 @@ window.addEventListener('load', function () {
   render();
 });
 
-
+}());
