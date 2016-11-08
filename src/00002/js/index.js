@@ -78,6 +78,7 @@ window.addEventListener('load', function () {
 	var quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), material );
   scene.add( quad );
   
+
   d3.select('#content').node().appendChild(renderer.domElement);
   renderer.clear();
 
@@ -88,6 +89,28 @@ window.addEventListener('load', function () {
   }
   , false );
   let prevTime = window.performance.now();
+  let play = false;
+  let display = true;
+  d3.select('#playbutton')
+  .on('click',function(){
+
+    if(display){
+      play = !play;
+      if(play){
+        d3.select(this).attr('class','hidden');
+        d3.select(this).html('<i class="fa fa-stop" aria-hidden="true"></i>');
+        display = false;
+        render();
+      } else {
+        d3.select(this).attr('class','active');
+        d3.select(this).html('<i class="fa fa-play" aria-hidden="true"></i>');
+      }
+    } else {
+      d3.select(this).attr('class','active1');
+      display = true;
+    }
+  });
+
   function render() {
     let now = window.performance.now();
     time += now - prevTime;
@@ -96,7 +119,8 @@ window.addEventListener('load', function () {
     uniforms.resolution.value.y = HEIGHT;
     uniforms.time.value = time;//time / 1000;
     renderer.render(scene,camera);
-    requestAnimationFrame(render);
+    if(play)
+      requestAnimationFrame(render);
   }
   render();
 });
