@@ -44,8 +44,9 @@ void main()	{
   p.x = (-1.0 + 2.0 * gl_FragCoord.x / resolution.x) * resolution.x / resolution.y ;
   p.y = -1.0 + 2.0 * gl_FragCoord.y / resolution.y;
 
-  float c = cos(atan(p.y,p.x) * 36.0 ) * sin(length(p) * 36.0 + time / 100.) ;
-  gl_FragColor = smoothstep(0.5, 0., abs(c - 0.5) ) * vec4(1.,0.,1.,1.);
+  float c = cos(atan(p.y,p.x) * 36.0  + time / 100.) + sin(length(p) * 36.0 + time / 100.) ;
+  c = smoothstep(0.8, 0., abs(c - 0.5) ); 
+  gl_FragColor = vec4(c,0.,0.,c);
 }`;
 
 // メイン
