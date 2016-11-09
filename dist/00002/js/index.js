@@ -58,9 +58,13 @@ window.addEventListener('load', function () {
   renderer.clear();
 
   window.addEventListener( 'resize', ()=>{
-        WIDTH = window.innerWidth;
-        HEIGHT = window.innerHeight;
-				renderer.setSize(WIDTH,HEIGHT);
+    WIDTH = window.innerWidth;
+    HEIGHT = window.innerHeight;
+    renderer.setSize(WIDTH,HEIGHT);
+    if(!play)
+    {
+      render();
+    }
   }
   , false );
   let prevTime = window.performance.now();
