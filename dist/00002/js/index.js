@@ -57,6 +57,10 @@ window.addEventListener('load', function () {
   d3.select('#content').node().appendChild(renderer.domElement);
   renderer.clear();
 
+  let prevTime = window.performance.now();
+  let play = false;
+  let display = true;
+
   window.addEventListener( 'resize', ()=>{
     WIDTH = window.innerWidth;
     HEIGHT = window.innerHeight;
@@ -67,9 +71,6 @@ window.addEventListener('load', function () {
     }
   }
   , false );
-  let prevTime = window.performance.now();
-  let play = false;
-  let display = true;
   d3.select('#playbutton')
   .on('click',function(){
 
