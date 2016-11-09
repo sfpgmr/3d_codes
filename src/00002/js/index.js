@@ -94,8 +94,7 @@ window.addEventListener('load', function () {
     {
       render();
     }
-  }
-  , false );
+  });
   d3.select('#playbutton')
   .on('click',function(){
 
