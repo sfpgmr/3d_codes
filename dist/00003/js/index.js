@@ -35,7 +35,7 @@ void main()	{
 // メイン
 window.addEventListener('load', function () {
   var WIDTH = window.innerWidth , HEIGHT = window.innerHeight;
-  d3.select('#playbutton').style('font-size',WIDTH / 20 + 'px');
+  d3.select('#playbutton').style('font-size',+(WIDTH / 20) + 'px');
 
   var renderer = new THREE.WebGLRenderer({ antialias: false, sortObjects: true });
 
@@ -74,8 +74,8 @@ window.addEventListener('load', function () {
   window.addEventListener( 'resize', ()=>{
     WIDTH = window.innerWidth;
     HEIGHT = window.innerHeight;
+  d3.select('#playbutton').style('font-size',+(WIDTH / 20) + 'px');
     renderer.setSize(WIDTH,HEIGHT);
-    d3.select('#playbutton').style('font-size',WIDTH / 20 + 'px');
     if(!play)
     {
       render();
