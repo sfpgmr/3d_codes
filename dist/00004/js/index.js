@@ -28,7 +28,8 @@ float lengthN(vec3 v, float n)
  
 float distanceFunction(vec3 pos)
 {
-  return lengthN(trans(pos), 4.0) - 1.0;
+//  return lengthN(trans(pos), 4.0) - 1.0;
+  return length(trans(pos)) - 1.0;
 }
  
 vec3 getNormal(vec3 p)
