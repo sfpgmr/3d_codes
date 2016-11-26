@@ -99,7 +99,7 @@ window.addEventListener('load', function () {
   window.addEventListener( 'resize', ()=>{
     WIDTH = window.innerWidth;
     HEIGHT = window.innerHeight;
-  d3.select('#playbutton').style('font-size',+(WIDTH / 20) + 'px');
+    d3.select('#playbutton').style('font-size',+(WIDTH / 20) + 'px');
     renderer.setSize(WIDTH,HEIGHT);
     if(!play)
     {

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html vocab="http://schema.org" lang="ja">
+<head>
+  <title>Three.jsによるアニメーション</title>
+  <meta charset="utf-8" />
+  <meta name="description" content="SVGアニメーションのテスト" />
+  <meta name="keywords" content="Youtube,d3.js,Q.js,jquery" />
+  <meta name="author" content="sfpgmr" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <script src="//d3js.org/d3.v4.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r81/three.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.2/normalize.min.css" />
+  <style>
+    html {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 100%;
+      height: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #svg {
+      display: none;
+    }
+
+    #stat {
+      position: absolute;
+      color:white;
+      font-size:20px;
+    }
+
+    #playbutton 
+   {
+      position:absolute;
+      border:none;
+      background:none;
+      color:white;
+      font-size:50px;
+      top:0;
+      left:0;
+      height:100%;
+      width:100%;
+    }
+
+    #playbutton:hover{
+      cursor: hand;
+    }
+
+    .active {
+      opacity: 1;
+    }
+
+    .active1 {
+      animation: anime2 5s;
+      opacity: 0.0;
+      border:0;
+    }
+
+    .hidden {
+      animation: anime1 2s;
+      opacity:0.0;
+    }
+
+
+@keyframes anime1 {
+0% {opacity:1.0;}
+100% {opacity:0.0;}
+}
+
+@keyframes anime2 {
+0% {opacity:1.0;}
+80% {opacity: 1.0;}
+100% {opacity:0.0;}
+}
+
+    #content {
+      position:relative;
+      margin:auto;
+      text-align: center;
+    }
+    #console {
+      margin:auto;
+      text-align: center;
+    }
+  </style>
+  <script src="https://use.fontawesome.com/cf664fe0e6.js"></script>
+</head>
+<body>
+  <div id="stat"></div>
+  <div id="content">
+    <button id="playbutton" class="active"><i class="fa fa-play" aria-hidden="true"></i></button>
+  </div>
+  <script type="text/javascript" src="./js/index.js"></script>
+</body>
+</html>
