@@ -33,6 +33,7 @@ window.addEventListener('load', function () {
   let graphics = new Graphics(window);
   let play = false;
   let display = true;
+  let isRender = false;
 
   function resize() {
     graphics.resize();
@@ -45,6 +46,9 @@ window.addEventListener('load', function () {
 
   d3.select('#content').node().appendChild(graphics.renderer.domElement);
 
+  let time = 0;
+  let prevTime = 0;
+
   d3.select('#playbutton')
   .on('click',function(){
 
@@ -54,11 +58,14 @@ window.addEventListener('load', function () {
         d3.select(this).attr('class','hidden');
         d3.select(this).html('<i class="fa fa-stop" aria-hidden="true"></i>');
         display = false;
-        graphics.renderStart();
+        isRender = true;
+        time = 0;
+        prevTime = 0;
+        render();
       } else {
         d3.select(this).attr('class','active');
         d3.select(this).html('<i class="fa fa-play" aria-hidden="true"></i>');
-        graphics.renderStop();
+        isRender = false;
       }
     } else {
       d3.select(this).attr('class','active1');
@@ -68,6 +75,20 @@ window.addEventListener('load', function () {
   graphics.cls();
   graphics.print(0,0,'TEST',7,0);
   graphics.render();
+  let c1 = {x:10,y:0}, c2 = {x:20,y:150},c3 = {x:200,y:100};
+  function render(){
+    let now = window.performance.now();
+    time += now - prevTime;
+    prevTime = now;
+    graphics.cls();
+    graphics.triangleFill(c1,c2,{x:200,y:(100 * Math.sin(time / 500) + 100) | 0},7);
+    graphics.print(0,0,'TEST',2,0);
+    graphics.render(time);
+    if(isRender){
+      requestAnimationFrame(render);
+    }
+  }
 });
+
 
 

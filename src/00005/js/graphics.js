@@ -249,34 +249,30 @@ export default class Graphics {
 
     this.prevTime = window.performance.now();
     this.isRender = false;
-    for (let x = 0; x < 320; ++x) {
-      for (let y = 0; y < 200; ++y) {
-        this.pset(x, y, y % 8);
-      }
-    }
+    // for (let x = 0; x < 320; ++x) {
+    //   for (let y = 0; y < 200; ++y) {
+    //     this.pset(x, y, y % 8);
+    //   }
+    // }
 
-
+    
     this.render();
 
   }
 
-  render() {
-    let now = this.window.performance.now();
-    this.time += now - this.prevTime;
-    this.prevTime = now;
+  render(time) {
+    this.time = time;
     this.uniforms.time.value = this.time;//time / 1000;
-    for(let i = 0;i < 8;++i){
-      this.palletColors[i] = (this.time / 50 + i) % 8;
-    }
-
-    this.print(0,0,'TEST',7,0);
+    // for(let i = 0;i < 8;++i){
+    //   this.palletColors[i] = (this.time / 50 + i) % 8;
+    // }
     this.texturePallet.needsUpdate = true;
     this.texCharCodeBuffer.needsUpdate = true;
     this.texCharAttrBuffer.needsUpdate = true;
-    // this.textureB.needsUpdate = true;
-    // this.textureG.needsUpdate = true;
-    // this.textureR.needsUpdate = true;
-    // this.texturePallet.needsUpdate = true;
+    this.textureB.needsUpdate = true;
+    this.textureG.needsUpdate = true;
+    this.textureR.needsUpdate = true;
+    this.texturePallet.needsUpdate = true;
     this.renderer.render(this.vscene, this.vcamera,this.renderTarget);
     this.renderer.render(this.scene,this.camera);
     if (this.isRender)
@@ -388,5 +384,131 @@ export default class Graphics {
     let offset = x + y * this.charCodeBufferWidth;
     this.charAttrBuffer[offset] = (color << 4) | bgcolor | (this.charAttrBuffer[offset] & 0x80);
   }
+
+// 三角形描画ルーチン
+// 参考：http://fussy.web.fc2.com/algo/polygon3_misc.htm
+/*
+  三角形描画スキャンライン描画
+*/
+triangleFillXDraw( l,r,sy,ey,c )
+{
+  for ( ; sy < ey ; ++sy ) {
+    let sx_ = l[0] | 0;
+    let ex_ = r[0] | 0;
+    // X 座標のクリッピング
+    if ( sx_ < 0 ) sx_ = 0;
+    if ( ex_ >= this.VWIDTH ) ex_ = this.VWIDTH - 1;
+
+    // スキャンライン描画
+    for ( ; sx_ <= ex_ ; ++sx_ )
+      this.pset(sx_,sy,c);
+
+    // X 座標の更新
+    l[0] += l[1];
+    r[0] += r[1]; 
+  }
+  return sy;
+}
+
+/*
+  TriFill_Main : 三角形描画用 メイン・ルーチン
+*/
+triangleFillMain(top,middle,bottom,c)
+{
+  // 上側の頂点からの描画開始 X 座標(頂角が描画領域外の場合、異なる座標になる)
+  let top_mid_x = top.x; // top - middle
+  let top_btm_x = top.x; // top - bottom
+
+  // 上側に水平な辺がある場合は中央の頂点で初期化する
+  if ( top.y == middle.y )
+    top_mid_x = middle.x;
+
+  let sy = top.y;    // 描画開始 Y 座標
+  let my = middle.y; // 中央の頂点の Y 座標
+  let ey = bottom.y; // 描画終了 Y 座標
+
+  // クリッピング
+
+  // 上側の頂点が領域外の場合
+  if ( top.y < 0 ) {
+    sy = 0;
+    // 上側から中央への辺をクリッピング
+    if ( middle.y >= 0 ) {
+      if ( top.y != middle.y )
+        top_mid_x = ( middle.x - top.x ) * middle.y / ( top.y - middle.y ) + middle.x;
+    } else {
+      if ( middle.y != bottom.y )
+        top_mid_x = ( bottom.x - middle.x ) * bottom.y / ( middle.y - bottom.y ) + bottom.x;
+    }
+    // 上側から下側への辺をクリッピング
+    if ( top.y != bottom.y )
+      top_btm_x = ( bottom.x - top.x ) * bottom.y / ( top.y - bottom.y ) + bottom.x;
+  }
+
+  // 下側の頂点が領域外の場合は描画終了 Y 座標を描画領域内にする
+  if ( bottom.y >= this.VHEIGHT )
+    ey = this.VHEIGHT - 1;
+
+  // X 座標に対する増分
+  let top_mid_a = ( middle.y != top.y ) ?
+    ( middle.x - top.x ) / ( middle.y - top.y ) : 0;       // top - middle
+  let mid_btm_a = ( middle.y != bottom.y ) ?
+    ( middle.x - bottom.x ) / ( middle.y - bottom.y ) : 0; // middle - bottom
+  let top_btm_a = ( top.y != bottom.y ) ?
+    ( top.x - bottom.x ) / ( top.y - bottom.y ) : 0;       // top - bottom
+
+  // 描画開始 X 座標とその増分の pair
+  let top_mid = [top_mid_x, top_mid_a];
+  let top_btm = [top_btm_x, top_btm_a];
+
+  // 中央の頂点が右向きか左向きかを判定して、各辺が左側・右側ののいずれかを決定する
+  // 中央の頂点を通る水平線が、上側・下側を通る直線と交わる点の X 座標
+  let splitLine_x = (( top.y != bottom.y ) ?
+    ( top.x - bottom.x ) * ( middle.y - top.y ) / ( top.y - bottom.y ) + top.x :
+    bottom.x) | 0; // 中央・下側の Y 座標が等しい場合、下側の X 座標
+  let l = ( middle.x < splitLine_x ) ? top_mid : top_btm; // 左側
+  let r = ( middle.x < splitLine_x ) ? top_btm : top_mid; // 右側
+
+  // 描画開始
+  sy = this.triangleFillXDraw(l, r, sy, my,c );
+  top_mid[1]= mid_btm_a;
+  this.triangleFillXDraw(l, r, sy, ey + 1,c );
+}
+
+/*
+  TriFill : 三角形描画用ルーチン 前処理
+
+  DrawingArea_IF& draw : 描画領域
+  GPixelOp& pset : 点描画に使う関数オブジェクト
+  Coord<int> c1, c2, c3 : 三角形の頂点
+*/
+triangleFill(c1, c2, c3,c)
+{
+
+  // Y 座標で昇順にソート
+  if ( c1.y > c2.y ) {
+    let tmp = c1;
+    c1 = c2;
+    c2 = tmp;
+  } 
+  if ( c1.y > c3.y ) {
+    let tmp = c1;
+    c1 = c3;
+    c3 = tmp;
+  }
+
+  if ( c2.y > c3.y ) {
+    let tmp = c2;
+    c2 = c3;
+    c3 = tmp; 
+  }
+
+  // ポリゴンが描画領域外なら処理しない
+  if ( c1.y >= this.VHEIGHT ) return;
+  if ( c3.y < 0 ) return;
+
+  // 描画ルーチン メインへ
+  this.triangleFillMain(c1, c2, c3,c );
+}
 
 }
