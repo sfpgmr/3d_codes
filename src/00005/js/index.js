@@ -75,7 +75,7 @@ window.addEventListener('load', function () {
   graphics.cls();
   graphics.print(0,0,'TEST',7,0);
   graphics.render();
-  let c1 = {x:0,y:0}, c2 = {x:0,y:199},c3 = {x:319,y:99};
+  let c1 = {x:160,y:0}, c2 = {x:0,y:199},c3 = {x:319,y:99};
   function render(){
     let now = window.performance.now();
     time += now - prevTime;
