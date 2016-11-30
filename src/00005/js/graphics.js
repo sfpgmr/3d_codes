@@ -303,30 +303,6 @@ export default class Graphics {
     this.isRender = false;
   }
 
-  // グラフィックのメソッドたち
-
-  pset(x, y, color) {
-    let offset = (y * this.bufferXSize + x / 8) | 0;
-    let bitpos = x % 8;
-
-
-    let b = (color & 1) << bitpos;
-    let m = ~(1 << bitpos) & 0xff;
-    let g = ((color >>> 1) & 1) << bitpos;
-    let r = ((color >>> 2) & 1) << bitpos;
-
-    this.bufferB[offset] = (this.bufferB[offset] & m) | b;
-    this.bufferG[offset] = (this.bufferG[offset] & m) | g;
-    this.bufferR[offset] = (this.bufferR[offset] & m) | r;
-  }
-
-  preset(x, y) {
-    let offset = (y * this.bufferXSize + x / 8) | 0;
-    let bit = ~(1 << (x % 8));
-    this.bufferB[offset] &= bit;
-    this.bufferG[offset] &= bit;
-    this.bufferR[offset] &= bit;
-  }
 
   cls() {
     for (var i = 0, e = this.bufferXSize * this.bufferHeight; i < e; ++i) {
@@ -384,13 +360,37 @@ export default class Graphics {
     let offset = x + y * this.charCodeBufferWidth;
     this.charAttrBuffer[offset] = (color << 4) | bgcolor | (this.charAttrBuffer[offset] & 0x80);
   }
+  // グラフィックのメソッドたち
+
+  pset(x, y, color) {
+    let offset = (y * this.bufferXSize + (x >>> 3)) | 0;
+    let bitpos = x & 7;
+
+
+    let b = (color & 1) << bitpos;
+    let m = ~(1 << bitpos) & 0xff;
+    let g = ((color >>> 1) & 1) << bitpos;
+    let r = ((color >>> 2) & 1) << bitpos;
+
+    this.bufferB[offset] = (this.bufferB[offset] & m) | b;
+    this.bufferG[offset] = (this.bufferG[offset] & m) | g;
+    this.bufferR[offset] = (this.bufferR[offset] & m) | r;
+  }
+
+  preset(x, y) {
+    let offset = (y * this.bufferXSize + x / 8) | 0;
+    let bit = ~(1 << (x % 8));
+    this.bufferB[offset] &= bit;
+    this.bufferG[offset] &= bit;
+    this.bufferR[offset] &= bit;
+  }
 
 // 三角形描画ルーチン
 // 参考：http://fussy.web.fc2.com/algo/polygon3_misc.htm
 /*
   三角形描画スキャンライン描画
 */
-triangleFillXDraw( l,r,sy,ey,c )
+triangleFillXDraw( l,r,sy,ey,c,tilePattern )
 {
   for ( ; sy < ey ; ++sy ) {
     let sx_ = l[0] | 0;
@@ -399,9 +399,70 @@ triangleFillXDraw( l,r,sy,ey,c )
     if ( sx_ < 0 ) sx_ = 0;
     if ( ex_ >= this.VWIDTH ) ex_ = this.VWIDTH - 1;
 
+    let syBytePos = sy * this.bufferXSize;
+
     // スキャンライン描画
-    for ( ; sx_ <= ex_ ; ++sx_ )
-      this.pset(sx_,sy,c);
+    // for ( ; sx_ <= ex_ ; ++sx_ )
+    //   this.pset(sx_,sy,c);
+
+    let sxBytePos = (sx_ >> 3) + syBytePos;
+    let sxBitPos = sx_ & 7;
+    let sxMask1 = (1 << sxBitPos) - 1;
+    let sxMask = ~sxMask1;
+    let exBytePos = (ex_ >> 3) + syBytePos;
+    let exBitPos = ex_ & 7;
+    let exMask = (2 << exBitPos) - 1;
+    let exMask1 = ~exMask;
+    let tile = tilePattern[sy & 1];
+
+    if(sxBytePos == exBytePos){
+        let mask = sxMask & exMask;
+        if(c & 1){
+          this.bufferB[sxBytePos] = (this.bufferB[sxBytePos] & (~mask)) |  (tile & mask);
+        }
+        if(c & 2){
+          this.bufferG[sxBytePos] = (this.bufferG[sxBytePos] & (~mask)) | (tile & mask);
+        }
+        if(c & 4){
+          this.bufferR[sxBytePos] = (this.bufferR[sxBytePos] & (~mask)) | (tile & mask);
+        }
+    } else {
+      if(sxBitPos){
+        if(c & 1){
+          this.bufferB[sxBytePos] =  (this.bufferB[sxBytePos] & sxMask1) | (tile & sxMask);
+        }
+        if(c & 2){
+          this.bufferG[sxBytePos] =  (this.bufferG[sxBytePos] & sxMask1) | (tile & sxMask);
+        }
+        if(c & 4){
+          this.bufferR[sxBytePos] =  (this.bufferR[sxBytePos] & sxMask1) | (tile & sxMask);
+        }
+        ++sxBytePos; 
+      }
+      for(;sxBytePos < exBytePos;++sxBytePos){
+        if(c & 1){
+          this.bufferB[sxBytePos] =  tile;
+        }
+        if(c & 2){
+          this.bufferG[sxBytePos] =  tile;
+        }
+        if(c & 4){
+          this.bufferR[sxBytePos] =  tile;
+        }
+      }
+      if(exBitPos){
+      if(c & 1){
+        this.bufferB[sxBytePos] =  (this.bufferB[sxBytePos] & exMask1) | (tile & exMask);
+      }
+      if(c & 2){
+        this.bufferG[sxBytePos] =  (this.bufferG[sxBytePos] & exMask1) | (tile & exMask);
+      }
+      if(c & 4){
+        this.bufferR[sxBytePos] =  (this.bufferR[sxBytePos] & exMask1) | (tile & exMask);
+      }     
+
+      }
+    }
 
     // X 座標の更新
     l[0] += l[1];
@@ -413,7 +474,7 @@ triangleFillXDraw( l,r,sy,ey,c )
 /*
   TriFill_Main : 三角形描画用 メイン・ルーチン
 */
-triangleFillMain(top,middle,bottom,c)
+triangleFillMain(top,middle,bottom,c,tileNo)
 {
   // 上側の頂点からの描画開始 X 座標(頂角が描画領域外の場合、異なる座標になる)
   let top_mid_x = top.x; // top - middle
@@ -469,20 +530,17 @@ triangleFillMain(top,middle,bottom,c)
   let l = ( middle.x < splitLine_x ) ? top_mid : top_btm; // 左側
   let r = ( middle.x < splitLine_x ) ? top_btm : top_mid; // 右側
 
-  // 描画開始
-  sy = this.triangleFillXDraw(l, r, sy, my,c );
+  // 描画
+  let t = Graphics.Tiles[tileNo];
+  sy = this.triangleFillXDraw(l, r, sy, my,c,t );
   top_mid[1]= mid_btm_a;
-  this.triangleFillXDraw(l, r, sy, ey + 1,c );
+  this.triangleFillXDraw(l, r, sy, ey + 1,c,t);
 }
 
 /*
-  TriFill : 三角形描画用ルーチン 前処理
-
-  DrawingArea_IF& draw : 描画領域
-  GPixelOp& pset : 点描画に使う関数オブジェクト
-  Coord<int> c1, c2, c3 : 三角形の頂点
+  三角形描画用ルーチン 前処理
 */
-triangleFill(c1, c2, c3,c)
+triangleFill(c1, c2, c3,c,tileNo)
 {
 
   // Y 座標で昇順にソート
@@ -508,7 +566,22 @@ triangleFill(c1, c2, c3,c)
   if ( c3.y < 0 ) return;
 
   // 描画ルーチン メインへ
-  this.triangleFillMain(c1, c2, c3,c );
+  this.triangleFillMain(c1, c2, c3,c,tileNo);
 }
 
 }
+
+Graphics.Tiles = [
+  // 0
+  [parseInt("00000000",2),
+   parseInt("00000000",2)],
+  // 1
+  [parseInt("00100010",2),
+   parseInt("10001000",2)],
+  // 2
+  [parseInt("10101010",2),
+   parseInt("01010101",2)],
+  // 3
+  [parseInt("11111111",2),
+   parseInt("11111111",2)],
+];

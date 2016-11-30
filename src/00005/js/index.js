@@ -75,13 +75,13 @@ window.addEventListener('load', function () {
   graphics.cls();
   graphics.print(0,0,'TEST',7,0);
   graphics.render();
-  let c1 = {x:10,y:0}, c2 = {x:20,y:150},c3 = {x:200,y:100};
+  let c1 = {x:0,y:0}, c2 = {x:0,y:199},c3 = {x:319,y:99};
   function render(){
     let now = window.performance.now();
     time += now - prevTime;
     prevTime = now;
     graphics.cls();
-    graphics.triangleFill(c1,c2,{x:200,y:(100 * Math.sin(time / 500) + 100) | 0},7);
+    graphics.triangleFill(c1,c2,c3,7,(now / 250) & 3);
     graphics.print(0,0,'TEST',2,0);
     graphics.render(time);
     if(isRender){
